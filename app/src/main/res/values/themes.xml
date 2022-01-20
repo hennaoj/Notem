@@ -1,0 +1,27 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.Notem" parent="Theme.MaterialComponents.Light.DarkActionBar">
+
+        //added for fixing strange behaviour in dark mode
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+
+        <!-- Primary brand color. -->
+        <item name="colorPrimaryVariant">@color/Navy200</item>
+        <item name="colorPrimary">@color/Navy400</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/Mint200</item>
+        <item name="colorSecondaryVariant">@color/Mint400</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="Theme.Notem.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.Notem.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+</resources>
