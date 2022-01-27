@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="Mint200">#FFD1FFD7</color>
-    <color name="Mint400">#FFB3FFB3</color>
+    <color name="Mustard200">#FFD1FFD7</color>
     <color name="Navy200">#FF87A0B2</color>
     <color name="Navy400">#FF274060</color>
     <color name="black">#FF000000</color>

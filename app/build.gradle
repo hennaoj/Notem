@@ -68,4 +68,15 @@ dependencies {
 
     //Accompanist
     implementation "com.google.accompanist:accompanist-insets:0.21.0-beta"
+
+    //ConstraintLayout
+    implementation "androidx.constraintlayout:constraintlayout-compose:1.0.0-rc02"
+
+    //Preferences DataStore
+    implementation "androidx.datastore:datastore-preferences:1.0.0"
+
+    implementation "androidx.datastore:datastore:1.0.0"
+
+    implementation 'com.google.android.material:material:1.1.0'
+
 }

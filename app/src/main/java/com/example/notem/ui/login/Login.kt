@@ -1,11 +1,12 @@
 package com.example.notem.login
 
+import android.content.Context
+import android.view.View
+import android.widget.TextView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -14,16 +15,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
+import com.example.notem.MainActivity
 import com.example.notem.R
+import com.example.notem.UserPreferences
 import com.google.accompanist.insets.systemBarsPadding
 
 @Composable
 fun Login(
-    navController: NavController
+    navController: NavController,
+    preUsername: String?,
+    prePassword: String?
 ) {
+
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.primaryVariant) {
         val username = rememberSaveable { mutableStateOf("") }
         val password = rememberSaveable { mutableStateOf("") }
@@ -67,7 +73,13 @@ fun Login(
             )
             Spacer(modifier = Modifier.height(10.dp))
             Button(
-                onClick = {  navController.navigate(route = "home") },
+                onClick = { checkDetails(
+                    username = username.value,
+                    password = password.value,
+                    preUsername= preUsername,
+                    prePassword = prePassword,
+                    navController = navController
+                )  },
                 enabled = true,
                 shape = MaterialTheme.shapes.medium,
             ) {
@@ -75,5 +87,18 @@ fun Login(
             }
         }
 
+    }
+}
+
+
+fun checkDetails(
+    username: String,
+    password: String,
+    preUsername: String?,
+    prePassword: String?,
+    navController: NavController
+) {
+    if ( username == preUsername &&  password == prePassword ) {
+        navController.navigate(route = "home")
     }
 }

@@ -10,8 +10,7 @@
         <item name="colorPrimary">@color/Navy400</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/Mint200</item>
-        <item name="colorSecondaryVariant">@color/Mint400</item>
+        <item name="colorSecondary">@color/Mustard200</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
