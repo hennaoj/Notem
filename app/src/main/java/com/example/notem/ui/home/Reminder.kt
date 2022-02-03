@@ -9,10 +9,12 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.example.notem.data.entity.Reminder
+import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
@@ -53,13 +55,13 @@ private fun ReminderList(
 }
 
 @Composable
-private fun ReminderListItem(
+fun ReminderListItem(
     reminder: Reminder,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     ConstraintLayout(modifier = modifier.clickable { onClick() }) {
-        val (divider, reminderConstrain, box) = createRefs()
+        val (divider, reminderConstrain, box, date) = createRefs()
         Divider(
             color = MaterialTheme.colors.primary,
             modifier = Modifier.constrainAs(divider) {
@@ -76,8 +78,31 @@ private fun ReminderListItem(
             }
         )
         Text(
+            text = when {
+                reminder.reminderDate != null -> { reminder.reminderDate.formatToString() }
+                else -> Date().formatToString()
+            },
+            color = Color.Black,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            style = MaterialTheme.typography.caption,
+            modifier = Modifier.constrainAs(date) {
+                linkTo(
+                    start = box.start,
+                    end = box.end,
+                    startMargin = 24.dp,
+                    endMargin = 24.dp,
+                    bias = 0f
+                )
+                centerVerticallyTo(reminderConstrain)
+                bottom.linkTo(reminderConstrain.top)
+                top.linkTo(parent.top)
+            }
+        )
+        Text(
             text = reminder.reminderText,
             style = MaterialTheme.typography.body1,
+            maxLines = 1,
             color = Color.Black,
             modifier = Modifier.constrainAs(reminderConstrain) {
                 linkTo(
@@ -88,8 +113,8 @@ private fun ReminderListItem(
                     bias = 0f
                 )
                 top.linkTo(
-                    parent.top,
-                    margin = 20.dp
+                    date.bottom,
+                    margin = 5.dp
                 )
                 bottom.linkTo(
                     parent.bottom,
@@ -100,4 +125,8 @@ private fun ReminderListItem(
         )
 
     }
+}
+
+private fun Date.formatToString(): String {
+    return SimpleDateFormat("EEE, d MMM yyyy, 'klo' HH:mm", Locale.getDefault()).format(this)
 }

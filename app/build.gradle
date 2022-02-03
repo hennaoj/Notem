@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -73,10 +74,17 @@ dependencies {
     implementation "androidx.constraintlayout:constraintlayout-compose:1.0.0-rc02"
 
     //Preferences DataStore
-    implementation "androidx.datastore:datastore-preferences:1.0.0"
+    implementation "androidx.datastore:datastore-preferences:1.0.0-alpha05"
+
+    implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.3.1"
 
     implementation "androidx.datastore:datastore:1.0.0"
 
     implementation 'com.google.android.material:material:1.1.0'
+
+    // Room
+    implementation "androidx.room:room-ktx:2.4.1"
+    kapt "androidx.room:room-compiler:2.4.1"
 
 }

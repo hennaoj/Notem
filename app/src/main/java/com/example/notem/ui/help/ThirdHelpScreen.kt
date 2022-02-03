@@ -1,54 +1,70 @@
-package com.example.notem.ui.profile
+package com.example.notem.ui.help
 
-import android.app.Application
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.notem.data.UserViewModel
-import com.example.notem.data.UserViewModelFactory
 import com.google.accompanist.insets.systemBarsPadding
 
 @Composable
-fun Profile(
+fun ThirdHelpScreen(
     navController: NavController
 ) {
-
-    var firstName = ""
-    var lastName = ""
-    var username = ""
-
-    val context = LocalContext.current
-    val userViewModel: UserViewModel = viewModel(
-        factory = UserViewModelFactory(context.applicationContext as Application)
-    )
-
-    val users = userViewModel.readAllData.observeAsState(listOf()).value
-
-    for (i in users.indices) {
-        if (users[i].loggedIn) {
-            firstName = users[i].first
-            lastName = users[i].last
-            username = users[i].userName
-        }
-    }
-
-    Surface (color = MaterialTheme.colors.primaryVariant) {
-        Column(
+    Surface(
+        color = MaterialTheme.colors.primary.copy(alpha = 0.7f)
+    ) {
+        Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .systemBarsPadding()
+                .padding(bottom = 20.dp, top = 60.dp, end = 40.dp, start = 40.dp)
         ) {
-            HomeAppBar(navController = navController)
-            Spacer(modifier = Modifier.height(50.dp))
+            ThirdHelpContent()
+        }
+        Row(
+            horizontalArrangement = Arrangement.Center
+        ) {
+            IconButton(
+                onClick = { navController.navigate(route = "home") },
+                modifier = Modifier.fillMaxWidth().padding(top = 5.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowForward,
+                    contentDescription = null
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ThirdHelpContent(
+) {
+    Scaffold(
+        backgroundColor = MaterialTheme.colors.primaryVariant
+    ) {
+        Column(
+            modifier = Modifier
+                .systemBarsPadding()
+                .fillMaxWidth()
+        ) {
+            HomeAppBar()
+            Text(
+                text = "Through the profile screen, you can edit your user information such as the username and password.",
+                style = MaterialTheme.typography.h6,
+                color = Color.Black,
+                modifier = Modifier.padding(
+                    end = 24.dp,
+                    start = 24.dp,
+                    bottom = 20.dp,
+                    top = 20.dp
+                )
+            )
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -65,17 +81,17 @@ fun Profile(
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
-                    text = "$firstName $lastName",
+                    text = "Joe Average",
                     color = MaterialTheme.colors.onSecondary
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
-                    text = username,
+                    text = "username",
                     color = MaterialTheme.colors.onSecondary
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Button(
-                    onClick = { navController.navigate(route = "editProfile") },
+                    onClick = { },
                     enabled = true,
                     shape = MaterialTheme.shapes.medium,
                 ) {
@@ -83,27 +99,28 @@ fun Profile(
                 }
             }
         }
-
     }
 }
 
 @Composable
 private fun HomeAppBar(
-    navController: NavController
 ) {
     TopAppBar{
         IconButton(
-            onClick = { navController.navigate(route = "home") },
-            modifier = Modifier.fillMaxWidth(fraction = 0.2f)
+            onClick = { },
+            modifier = Modifier.fillMaxWidth(fraction = 0.2f),
+            enabled = false
         ) {
             Icon(
                 imageVector = Icons.Default.Home,
-                contentDescription = null,
+                contentDescription = null
+
             )
         }
         IconButton(
             onClick = { },
-            modifier = Modifier.fillMaxWidth(fraction = 0.25f)
+            modifier = Modifier.fillMaxWidth(fraction = 0.25f),
+            enabled = false
         ) {
             Icon(
                 imageVector = Icons.Default.Place,
@@ -111,17 +128,20 @@ private fun HomeAppBar(
             )
         }
         IconButton(
-            onClick = { navController.navigate(route = "profile") },
-            modifier = Modifier.fillMaxWidth(fraction = 0.3333f)
+            onClick = {  },
+            modifier = Modifier.fillMaxWidth(fraction = 0.3333f),
+            enabled = false
         ) {
             Icon(
                 imageVector = Icons.Default.Person,
-                contentDescription = null
+                contentDescription = null,
+                tint = Color.White
             )
         }
         IconButton(
-            onClick = { navController.navigate(route = "help") },
-            modifier = Modifier.fillMaxWidth(fraction = 0.5f)
+            onClick = { },
+            modifier = Modifier.fillMaxWidth(fraction = 0.5f),
+            enabled = false
         ) {
             Icon(
                 imageVector = Icons.Default.Info,
@@ -129,8 +149,9 @@ private fun HomeAppBar(
             )
         }
         IconButton(
-            onClick = { navController.navigate(route = "login") },
-            modifier = Modifier.fillMaxWidth(fraction = 1f)
+            onClick = { },
+            modifier = Modifier.fillMaxWidth(fraction = 1f),
+            enabled = false
         ) {
             Icon(
                 imageVector = Icons.Default.ExitToApp,

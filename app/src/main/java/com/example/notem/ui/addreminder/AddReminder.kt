@@ -21,6 +21,8 @@ fun AddReminder(
 ) {
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.primaryVariant) {
         val reminder = rememberSaveable { mutableStateOf("") }
+        val date = rememberSaveable { mutableStateOf("") }
+        val location = rememberSaveable { mutableStateOf("") }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -48,7 +50,29 @@ fun AddReminder(
             OutlinedTextField(
                 value = reminder.value,
                 onValueChange = { data -> reminder.value = data },
-                label = { Text("reminder")},
+                label = { Text("title")},
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text
+                ),
+                shape = MaterialTheme.shapes.small,
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            OutlinedTextField(
+                value = date.value,
+                onValueChange = { data -> date.value = data },
+                label = { Text("date")},
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text
+                ),
+                shape = MaterialTheme.shapes.small,
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            OutlinedTextField(
+                value = location.value,
+                onValueChange = { data -> location.value = data },
+                label = { Text("location")},
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text
@@ -59,7 +83,7 @@ fun AddReminder(
             Button(
                 onClick = {  navController.navigate(route = "home") },
                 enabled = true,
-                shape = MaterialTheme.shapes.medium,
+                shape = MaterialTheme.shapes.medium
             ) {
                 Text(text = "add reminder")
             }

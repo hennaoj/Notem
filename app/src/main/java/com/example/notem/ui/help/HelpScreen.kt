@@ -1,59 +1,60 @@
-package com.example.notem.ui.home
+package com.example.notem.ui.help
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.google.accompanist.insets.systemBarsPadding
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.notem.data.entity.Reminder
 
 @Composable
-fun Home(
-    viewModel: HomeViewModel = viewModel(),
+fun HelpScreen(
     navController: NavController
 ) {
-        val viewState by viewModel.state.collectAsState()
-
+    Surface(
+        color = MaterialTheme.colors.primary.copy(alpha = 0.7f)
+    ) {
         Surface(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            HomeContent(
-                reminders = viewState.reminders,
-                navController = navController
-            )
-        }
-
-        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .systemBarsPadding()
+                .padding(bottom = 20.dp, top = 60.dp, end = 40.dp, start = 40.dp)
         ) {
-
+            HelpContent()
         }
+        Row(
+            horizontalArrangement = Arrangement.Center
+        ) {
+            IconButton(
+                onClick = { navController.navigate(route = "help2") },
+                modifier = Modifier.fillMaxWidth().padding(top = 5.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowForward,
+                    contentDescription = null
+                )
+            }
+        }
+    }
 }
 
 @Composable
-fun HomeContent(
-    reminders: List<Reminder>,
-    navController: NavController
+fun HelpContent(
 ) {
     Scaffold(
         floatingActionButton = { FloatingActionButton(
-            onClick = { navController.navigate(route = "addReminder") },
+            onClick = {},
             modifier = Modifier.padding(all = 10.dp)
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
                 contentDescription = null
             )
-        }},
+        }
+        },
         backgroundColor = MaterialTheme.colors.primaryVariant
     ) {
         Column(
@@ -61,35 +62,43 @@ fun HomeContent(
                 .systemBarsPadding()
                 .fillMaxWidth()
         ) {
-
-            HomeAppBar(
-                navController = navController
-            )
-
-            ReminderListInit(
-                reminders = reminders
+            HomeAppBar()
+            Text(
+                text = "You can add reminders in the home screen by pressing the button on the bottom right.",
+                style = MaterialTheme.typography.h6,
+                color = Color.Black,
+                modifier = Modifier.padding(
+                    end = 24.dp,
+                    start = 24.dp,
+                    bottom = 20.dp,
+                    top = 20.dp
+                )
             )
         }
     }
 }
 
+
+
 @Composable
 private fun HomeAppBar(
-    navController: NavController
 ) {
     TopAppBar{
         IconButton(
             onClick = { },
-            modifier = Modifier.fillMaxWidth(fraction = 0.2f)
+            modifier = Modifier.fillMaxWidth(fraction = 0.2f),
+            enabled = false
         ) {
             Icon(
                 imageVector = Icons.Default.Home,
                 contentDescription = null,
+                tint = Color.White
             )
         }
         IconButton(
             onClick = { },
-            modifier = Modifier.fillMaxWidth(fraction = 0.25f)
+            modifier = Modifier.fillMaxWidth(fraction = 0.25f),
+            enabled = false
         ) {
             Icon(
                 imageVector = Icons.Default.Place,
@@ -97,8 +106,9 @@ private fun HomeAppBar(
             )
         }
         IconButton(
-            onClick = { navController.navigate(route = "profile") },
-            modifier = Modifier.fillMaxWidth(fraction = 0.3333f)
+            onClick = {  },
+            modifier = Modifier.fillMaxWidth(fraction = 0.3333f),
+            enabled = false
         ) {
             Icon(
                 imageVector = Icons.Default.Person,
@@ -106,8 +116,9 @@ private fun HomeAppBar(
             )
         }
         IconButton(
-            onClick = { navController.navigate(route = "help") },
-            modifier = Modifier.fillMaxWidth(fraction = 0.5f)
+            onClick = { },
+            modifier = Modifier.fillMaxWidth(fraction = 0.5f),
+            enabled = false
         ) {
             Icon(
                 imageVector = Icons.Default.Info,
@@ -115,8 +126,9 @@ private fun HomeAppBar(
             )
         }
         IconButton(
-            onClick = { navController.navigate(route = "login") },
-            modifier = Modifier.fillMaxWidth(fraction = 1f)
+            onClick = { },
+            modifier = Modifier.fillMaxWidth(fraction = 1f),
+            enabled = false
         ) {
             Icon(
                 imageVector = Icons.Default.ExitToApp,
