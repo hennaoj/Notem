@@ -55,7 +55,7 @@ fun ThirdHelpContent(
         ) {
             HomeAppBar()
             Text(
-                text = "Through the profile screen, you can edit your user information such as the username and password.",
+                text = "Through the profile screen, you can edit your user information such as your name and username.",
                 style = MaterialTheme.typography.h6,
                 color = Color.Black,
                 modifier = Modifier.padding(

@@ -22,21 +22,11 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         repository = UserRepository(userDao)
         readAllData = repository.readAllData
 
-        loadUsersFromDb()
     }
 
     fun addUser(user: User) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.addUser(user = user)
-        }
-    }
-
-    private fun loadUsersFromDb() {
-        val list = mutableListOf(
-            User(userName = "tester", passWord = "password123", first = "Joe", last = "Average")
-        )
-        viewModelScope.launch {
-            list.forEach { user -> repository.addUser(user) }
         }
     }
 
