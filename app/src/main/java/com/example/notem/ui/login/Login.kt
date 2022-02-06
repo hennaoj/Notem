@@ -39,6 +39,12 @@ fun Login(
 
     val users = userViewModel.readAllData.observeAsState(listOf()).value
 
+    for (i in users.indices) {
+        if (users[i].loggedIn) {
+            userViewModel.logUser(loggedIn = false, id = users[i].userId)
+        }
+    }
+
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.primaryVariant) {
         val username = rememberSaveable { mutableStateOf("") }
         val password = rememberSaveable { mutableStateOf("") }
