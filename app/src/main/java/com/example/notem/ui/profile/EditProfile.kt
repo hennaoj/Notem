@@ -15,9 +15,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.notem.data.User
-import com.example.notem.data.UserViewModel
-import com.example.notem.data.UserViewModelFactory
+import com.example.notem.data.user.User
+import com.example.notem.data.user.UserViewModel
+import com.example.notem.data.user.UserViewModelFactory
 import com.google.accompanist.insets.systemBarsPadding
 
 
@@ -142,6 +142,7 @@ fun saveProfile(
     navController: NavController
 ) {
     viewModel.updateUser(user = User(userId = id, userName = username, first = first, last = last,
-        passWord = password, loggedIn = true))
+        passWord = password, loggedIn = true)
+    )
     navController.navigate(route = "profile")
 }

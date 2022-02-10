@@ -1,5 +1,6 @@
 package com.example.notem.ui.home
 
+import android.app.Application
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -7,36 +8,44 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.google.accompanist.insets.systemBarsPadding
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.notem.data.entity.Reminder
+import com.example.notem.data.reminder.Reminder
+import com.example.notem.data.reminder.ReminderViewModel
+import com.example.notem.data.reminder.ReminderViewModelFactory
 
 @Composable
 fun Home(
-    viewModel: HomeViewModel = viewModel(),
     navController: NavController
 ) {
-        val viewState by viewModel.state.collectAsState()
+    val context = LocalContext.current
+    val reminderViewModel: ReminderViewModel = viewModel(
+        factory = ReminderViewModelFactory(context.applicationContext as Application)
+    )
 
-        Surface(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            HomeContent(
-                reminders = viewState.reminders,
-                navController = navController
-            )
-        }
+    val reminders = reminderViewModel.readAllData.observeAsState(listOf()).value
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .systemBarsPadding()
-        ) {
+    Surface(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        HomeContent(
+            reminders = reminders,
+            navController = navController
+        )
+    }
 
-        }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .systemBarsPadding()
+    ) {
+
+    }
 }
 
 @Composable
@@ -67,7 +76,8 @@ fun HomeContent(
             )
 
             ReminderListInit(
-                reminders = reminders
+                reminders = reminders,
+                navController = navController
             )
         }
     }
@@ -77,7 +87,7 @@ fun HomeContent(
 private fun HomeAppBar(
     navController: NavController
 ) {
-    TopAppBar{
+    TopAppBar {
         IconButton(
             onClick = { },
             modifier = Modifier.fillMaxWidth(fraction = 0.2f)
@@ -124,4 +134,5 @@ private fun HomeAppBar(
             )
         }
     }
+
 }

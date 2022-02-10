@@ -1,4 +1,4 @@
-package com.example.notem.data
+package com.example.notem.data.user
 
 import android.content.Context
 import androidx.room.Database

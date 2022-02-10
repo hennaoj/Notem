@@ -18,9 +18,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.notem.R
-import com.example.notem.data.User
-import com.example.notem.data.UserViewModel
-import com.example.notem.data.UserViewModelFactory
+import com.example.notem.data.user.User
+import com.example.notem.data.user.UserViewModel
+import com.example.notem.data.user.UserViewModelFactory
 import com.google.accompanist.insets.systemBarsPadding
 
 

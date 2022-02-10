@@ -1,39 +1,72 @@
 package com.example.notem.ui.home
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
+import android.app.Application
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.example.notem.data.entity.Reminder
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.example.notem.data.reminder.Reminder
+import com.example.notem.data.user.UserViewModel
+import com.example.notem.data.user.UserViewModelFactory
 import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
 fun ReminderListInit(
     modifier: Modifier = Modifier,
-    reminders: List<Reminder>
+    reminders: List<Reminder>,
+    navController: NavController
 ) {
+
+    val context = LocalContext.current
+    val userViewModel: UserViewModel = viewModel(
+        factory = UserViewModelFactory(context.applicationContext as Application)
+    )
+
+    val users = userViewModel.readAllData.observeAsState(listOf()).value
+    var userId: Long = 1
+
+    for (i in users.indices) {
+        if (users[i].loggedIn) {
+            userId = users[i].userId
+        }
+    }
+
+    val list: MutableList<Reminder> = mutableListOf()
+
+    for (item in reminders) {
+        if (item.creatorId == userId) {
+            list.add(item)
+        }
+    }
+
     Column(
         modifier = modifier
     ) {
         ReminderList(
-            list = reminders
+            list = list,
+            navController = navController
         )
     }
 }
 
 @Composable
 private fun ReminderList(
-    list: List<Reminder>
+    list: List<Reminder>,
+    navController: NavController
 ) {
     LazyColumn(
         contentPadding = PaddingValues(0.dp),
@@ -42,8 +75,8 @@ private fun ReminderList(
         items(list) { item ->
             ReminderListItem(
                 reminder = item,
-                onClick = {},
-                modifier = Modifier.fillParentMaxWidth()
+                modifier = Modifier.fillParentMaxWidth(),
+                navController = navController
             )
         }
 
@@ -57,11 +90,11 @@ private fun ReminderList(
 @Composable
 fun ReminderListItem(
     reminder: Reminder,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavController
 ) {
-    ConstraintLayout(modifier = modifier.clickable { onClick() }) {
-        val (divider, reminderConstrain, box, date) = createRefs()
+    ConstraintLayout(modifier = modifier.fillMaxWidth()) {
+        val (divider, reminderConstrain, box, date, edit) = createRefs()
         Divider(
             color = MaterialTheme.colors.primary,
             modifier = Modifier.constrainAs(divider) {
@@ -71,15 +104,17 @@ fun ReminderListItem(
             }
         )
         Box(
-            modifier = Modifier.size(100.dp).constrainAs(box) {
-                top.linkTo(parent.top)
-                centerHorizontallyTo(parent)
-                width = Dimension.fillToConstraints
-            }
+            modifier = Modifier
+                .size(100.dp)
+                .constrainAs(box) {
+                    top.linkTo(parent.top)
+                    centerHorizontallyTo(parent)
+                    width = Dimension.fillToConstraints
+                }
         )
         Text(
             text = when {
-                reminder.reminderDate != null -> { reminder.reminderDate.formatToString() }
+                reminder.reminderTime != null -> { reminder.reminderTime.formatToString() }
                 else -> Date().formatToString()
             },
             color = Color.Black,
@@ -100,7 +135,7 @@ fun ReminderListItem(
             }
         )
         Text(
-            text = reminder.reminderText,
+            text = reminder.message,
             style = MaterialTheme.typography.body1,
             maxLines = 1,
             color = Color.Black,
@@ -123,8 +158,30 @@ fun ReminderListItem(
                 width = Dimension.preferredWrapContent
             }
         )
+        ClickableText(
+            onClick = { navController.navigate(route = "editReminder/".plus(reminder.reminderId)) },
+            modifier = Modifier.constrainAs(edit) {
+                linkTo(
+                    start = date.end,
+                    end = parent.end,
+                    startMargin = 20.dp,
+                    endMargin = 10.dp,
+                    bias = 1f
+                )
+                top.linkTo(
+                    box.top,
+                    margin = 5.dp
+                )
+            },
+            text = AnnotatedString(text = "..."),
+            style = MaterialTheme.typography.h6
+        )
 
     }
+}
+
+private fun Long.formatToString(): String {
+    return SimpleDateFormat("EEE, d MMM yyyy, 'klo' HH:mm", Locale.getDefault()).format(this)
 }
 
 private fun Date.formatToString(): String {

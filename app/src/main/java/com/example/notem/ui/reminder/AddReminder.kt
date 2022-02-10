@@ -1,9 +1,7 @@
-package com.example.notem.ui.login
+package com.example.notem.ui.reminder
 
 import android.app.Application
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -13,26 +11,29 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.notem.R
-import com.example.notem.data.user.User
+import com.example.notem.data.reminder.Reminder
+import com.example.notem.data.reminder.ReminderViewModel
+import com.example.notem.data.reminder.ReminderViewModelFactory
 import com.example.notem.data.user.UserViewModel
 import com.example.notem.data.user.UserViewModelFactory
 import com.google.accompanist.insets.systemBarsPadding
+import java.text.ParsePosition
+import java.text.SimpleDateFormat
+import java.util.*
 
 @Composable
-fun Login(
+fun AddReminder(
     navController: NavController
 ) {
 
+    var userId: Long = 1
 
     val context = LocalContext.current
+
     val userViewModel: UserViewModel = viewModel(
         factory = UserViewModelFactory(context.applicationContext as Application)
     )
@@ -41,13 +42,17 @@ fun Login(
 
     for (i in users.indices) {
         if (users[i].loggedIn) {
-            userViewModel.logUser(loggedIn = false, id = users[i].userId)
+            userId = users[i].userId
         }
     }
 
+    val reminderViewModel: ReminderViewModel = viewModel(
+        factory = ReminderViewModelFactory(context.applicationContext as Application)
+    )
+
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.primaryVariant) {
-        val username = rememberSaveable { mutableStateOf("") }
-        val password = rememberSaveable { mutableStateOf("") }
+        val message = rememberSaveable { mutableStateOf("") }
+        val reminderTime = rememberSaveable { mutableStateOf("") }
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -56,18 +61,10 @@ fun Login(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Image(
-                painterResource(R.drawable.notem),
-                "content description",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .size(50.dp)
-            )
-            Spacer(modifier = Modifier.height(15.dp))
             OutlinedTextField(
-                value = username.value,
-                onValueChange = { data -> username.value = data },
-                label = { Text("username")},
+                value = message.value,
+                onValueChange = { data -> message.value = data },
+                label = { Text("reminder message")},
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text
@@ -76,51 +73,54 @@ fun Login(
             )
             Spacer(modifier = Modifier.height(10.dp))
             OutlinedTextField(
-                value = password.value,
-                onValueChange = { data -> password.value = data },
-                label = { Text("password")},
+                value = reminderTime.value,
+                onValueChange = { data -> reminderTime.value = data },
+                label = { Text("dd-mm-yyyy hh:mm")},
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password
                 ),
-                visualTransformation = PasswordVisualTransformation(),
                 shape = MaterialTheme.shapes.small,
             )
             Spacer(modifier = Modifier.height(10.dp))
             Button(
-                onClick = { checkDetails(
-                    username = username.value,
-                    password = password.value,
+                onClick = { addReminder(
+                    message = message.value,
+                    reminderTime = reminderTime.value,
+                    reminderViewModel = reminderViewModel,
                     navController = navController,
-                    users = users,
-                    viewModel = userViewModel
+                    userId = userId
                 ) },
                 enabled = true,
                 shape = MaterialTheme.shapes.medium,
             ) {
-                Text(text = "login")
+                Text(text = "add reminder")
             }
-            ClickableText(
-                text = AnnotatedString(text = "Create an account"),
-                onClick = { navController.navigate(route = "createAccount") },
-                modifier = Modifier.padding(20.dp)
-            )
         }
 
     }
 }
 
-fun checkDetails(
-    username: String,
-    password: String,
+fun addReminder(
+    message: String,
+    reminderTime: String,
+    reminderViewModel: ReminderViewModel,
     navController: NavController,
-    users: List<User>,
-    viewModel: UserViewModel
+    userId: Long
 ) {
-    for (i in users.indices) {
-        if (username == users[i].userName && password == users[i].passWord) {
-            viewModel.logUser(loggedIn = true, id = users[i].userId)
-            navController.navigate(route = "home")
-        }
+    val date = SimpleDateFormat("dd-MM-yyyy HH:mm").parse(reminderTime,  ParsePosition(0))
+    if (date != null) {
+        reminderViewModel.addReminder(
+            reminder = Reminder(
+                message = message,
+                locationX = 12,
+                locationY = 12,
+                reminderTime = date.time,
+                creationTime = Date().time,
+                creatorId = userId,
+                sendNotification = false
+            )
+        )
     }
+    navController.navigate(route = "home")
 }

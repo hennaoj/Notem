@@ -1,4 +1,4 @@
-package com.example.notem.data
+package com.example.notem.data.user
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -6,9 +6,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.notem.data.User
-import com.example.notem.data.UserDatabase
-import com.example.notem.data.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
