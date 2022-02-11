@@ -5,6 +5,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -40,6 +42,20 @@ fun CreateAccount(
         val password = rememberSaveable { mutableStateOf("") }
         val firstName = rememberSaveable { mutableStateOf("") }
         val lastName = rememberSaveable { mutableStateOf("") }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .systemBarsPadding()
+        ) { TopAppBar {
+            IconButton(
+                onClick = { navController.navigate(route = "login") },
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = null,
+                )
+            }
+        }}
         Column(
             modifier = Modifier
                 .fillMaxWidth()

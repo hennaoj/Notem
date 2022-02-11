@@ -96,7 +96,7 @@ fun ReminderListItem(
     modifier: Modifier = Modifier,
     navController: NavController
 ) {
-    val icon = ConvertToImageVector(icon = reminder.icon)
+    val icon = convertToImageVector(icon = reminder.icon)
     ConstraintLayout(modifier = modifier.fillMaxWidth()) {
         val (divider, reminderConstrain, box, date, edit, iconCons) = createRefs()
         Divider(
@@ -210,7 +210,7 @@ private fun Date.formatToString(): String {
     return SimpleDateFormat("EEE, d MMM yyyy, 'klo' HH:mm", Locale.getDefault()).format(this)
 }
 
-private fun ConvertToImageVector(icon: String): ImageVector {
+private fun convertToImageVector(icon: String): ImageVector {
     return when (icon) {
         "Default" -> {
             Icons.Filled.StickyNote2
