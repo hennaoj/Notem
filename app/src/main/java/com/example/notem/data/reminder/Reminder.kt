@@ -33,7 +33,10 @@ data class Reminder(
     var reminderSeen: Boolean = false,
 
     @ColumnInfo(name = "send_notification")
-    var sendNotification: Boolean
+    var sendNotification: Boolean,
+
+    @ColumnInfo(name = "icon")
+    var icon: String
 
 )
 

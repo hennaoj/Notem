@@ -1,12 +1,14 @@
 package com.example.notem.ui.reminder
 
 import android.app.Application
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,6 +55,7 @@ fun AddReminder(
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.primaryVariant) {
         val message = rememberSaveable { mutableStateOf("") }
         val reminderTime = rememberSaveable { mutableStateOf("") }
+        val icon = rememberSaveable { mutableStateOf("Default")}
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -61,6 +64,8 @@ fun AddReminder(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
+            IconListDropdown(reminderIcon = icon)
+            Spacer(modifier = Modifier.height(10.dp))
             OutlinedTextField(
                 value = message.value,
                 onValueChange = { data -> message.value = data },
@@ -89,7 +94,8 @@ fun AddReminder(
                     reminderTime = reminderTime.value,
                     reminderViewModel = reminderViewModel,
                     navController = navController,
-                    userId = userId
+                    userId = userId,
+                    icon = icon.value
                 ) },
                 enabled = true,
                 shape = MaterialTheme.shapes.medium,
@@ -106,7 +112,8 @@ fun addReminder(
     reminderTime: String,
     reminderViewModel: ReminderViewModel,
     navController: NavController,
-    userId: Long
+    userId: Long,
+    icon: String
 ) {
     val date = SimpleDateFormat("dd-MM-yyyy HH:mm").parse(reminderTime,  ParsePosition(0))
     if (date != null) {
@@ -118,9 +125,78 @@ fun addReminder(
                 reminderTime = date.time,
                 creationTime = Date().time,
                 creatorId = userId,
-                sendNotification = false
+                sendNotification = false,
+                icon = icon
             )
         )
     }
     navController.navigate(route = "home")
+}
+
+@Composable
+private fun IconListDropdown(
+    reminderIcon: MutableState<String>
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val icon = if (expanded) {
+        Icons.Filled.ArrowDropUp
+    } else {
+        Icons.Filled.ArrowDropDown
+    }
+
+    val icons = listOf(
+        Icons.Filled.StickyNote2,
+        Icons.Filled.Work,
+        Icons.Filled.MedicalServices,
+        Icons.Filled.Paid,
+        Icons.Filled.Event,
+        Icons.Filled.School
+    )
+
+    val iconLabels = listOf(
+        "Default",
+        "Work",
+        "Medical",
+        "Finances",
+        "Event",
+        "School"
+    )
+
+    Column {
+        OutlinedTextField(
+            value = reminderIcon.value,
+            onValueChange = { reminderIcon.value = it},
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("Icon")},
+            readOnly = true,
+            trailingIcon = {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    modifier = Modifier.clickable { expanded = !expanded }
+                )
+            }
+        )
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            for (i in icons.indices) {
+                DropdownMenuItem(
+                    onClick = {
+                        reminderIcon.value = iconLabels[i]
+                        expanded = false
+                    }
+                ) {
+                    Icon(
+                        imageVector = icons[i],
+                        contentDescription = null
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(text = iconLabels[i])
+                }
+            }
+        }
+    }
 }

@@ -6,10 +6,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
@@ -93,8 +96,9 @@ fun ReminderListItem(
     modifier: Modifier = Modifier,
     navController: NavController
 ) {
+    val icon = ConvertToImageVector(icon = reminder.icon)
     ConstraintLayout(modifier = modifier.fillMaxWidth()) {
-        val (divider, reminderConstrain, box, date, edit) = createRefs()
+        val (divider, reminderConstrain, box, date, edit, iconCons) = createRefs()
         Divider(
             color = MaterialTheme.colors.primary,
             modifier = Modifier.constrainAs(divider) {
@@ -158,11 +162,29 @@ fun ReminderListItem(
                 width = Dimension.preferredWrapContent
             }
         )
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.constrainAs(iconCons) {
+                linkTo(
+                    start = date.end,
+                    end = parent.end,
+                    startMargin = 10.dp,
+                    endMargin = 10.dp,
+                    bias = 0f
+                )
+                top.linkTo(
+                    box.top,
+                    margin = 8.dp
+                )
+            },
+            tint = Color.Black
+        )
         ClickableText(
             onClick = { navController.navigate(route = "editReminder/".plus(reminder.reminderId)) },
             modifier = Modifier.constrainAs(edit) {
                 linkTo(
-                    start = date.end,
+                    start = parent.start,
                     end = parent.end,
                     startMargin = 20.dp,
                     endMargin = 10.dp,
@@ -186,4 +208,28 @@ private fun Long.formatToString(): String {
 
 private fun Date.formatToString(): String {
     return SimpleDateFormat("EEE, d MMM yyyy, 'klo' HH:mm", Locale.getDefault()).format(this)
+}
+
+private fun ConvertToImageVector(icon: String): ImageVector {
+    return when (icon) {
+        "Default" -> {
+            Icons.Filled.StickyNote2
+        }
+        "Work" -> {
+            Icons.Filled.Work
+        }
+        "Medical" -> {
+            Icons.Filled.MedicalServices
+        }
+        "Finances" -> {
+            Icons.Filled.Paid
+        }
+        "School" -> {
+            Icons.Filled.School
+        }
+        "Event" -> {
+            Icons.Filled.School
+        }
+        else -> Icons.Filled.StickyNote2
+    }
 }
