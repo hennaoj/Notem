@@ -228,7 +228,7 @@ private fun ConvertToImageVector(icon: String): ImageVector {
             Icons.Filled.School
         }
         "Event" -> {
-            Icons.Filled.School
+            Icons.Filled.Event
         }
         else -> Icons.Filled.StickyNote2
     }
