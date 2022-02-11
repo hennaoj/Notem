@@ -8,9 +8,6 @@ import androidx.navigation.compose.rememberNavController
 class NotemAppState(
     val navController: NavHostController
 ) {
-    fun navigateBack() {
-        navController.popBackStack()
-    }
 }
 
 @Composable

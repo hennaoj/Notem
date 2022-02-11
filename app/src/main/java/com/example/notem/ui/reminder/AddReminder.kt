@@ -53,6 +53,20 @@ fun AddReminder(
     )
 
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.primaryVariant) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .systemBarsPadding()
+        ) { TopAppBar {
+            IconButton(
+                onClick = { navController.navigate(route = "profile") },
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = null,
+                )
+            }
+        }}
         val message = rememberSaveable { mutableStateOf("") }
         val reminderTime = rememberSaveable { mutableStateOf("") }
         val icon = rememberSaveable { mutableStateOf("Default")}

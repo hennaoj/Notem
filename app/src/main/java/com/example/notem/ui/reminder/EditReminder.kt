@@ -56,6 +56,20 @@ fun EditReminder(
             modifier = Modifier
                 .fillMaxSize()
                 .systemBarsPadding()
+        ) { TopAppBar {
+            IconButton(
+                onClick = { navController.navigate(route = "profile") },
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = null,
+                )
+            }
+        }}
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .systemBarsPadding()
         ) {
             TopAppBar {
                 IconButton(
