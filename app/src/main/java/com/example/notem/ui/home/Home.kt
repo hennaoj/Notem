@@ -6,8 +6,6 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -17,7 +15,7 @@ import com.google.accompanist.insets.systemBarsPadding
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.notem.data.reminder.Reminder
 import com.example.notem.data.reminder.ReminderViewModel
-import com.example.notem.data.reminder.ReminderViewModelFactory
+import com.example.notem.data.viewModelProviderFactoryOf
 
 @Composable
 fun Home(
@@ -25,7 +23,7 @@ fun Home(
 ) {
     val context = LocalContext.current
     val reminderViewModel: ReminderViewModel = viewModel(
-        factory = ReminderViewModelFactory(context.applicationContext as Application)
+        factory = viewModelProviderFactoryOf { ReminderViewModel(context.applicationContext as Application) }
     )
 
     val reminders = reminderViewModel.readAllData.observeAsState(listOf()).value

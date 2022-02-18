@@ -23,7 +23,7 @@ import androidx.navigation.NavController
 import com.example.notem.R
 import com.example.notem.data.user.User
 import com.example.notem.data.user.UserViewModel
-import com.example.notem.data.user.UserViewModelFactory
+import com.example.notem.data.viewModelProviderFactoryOf
 import com.google.accompanist.insets.systemBarsPadding
 
 @Composable
@@ -34,7 +34,7 @@ fun Login(
 
     val context = LocalContext.current
     val userViewModel: UserViewModel = viewModel(
-        factory = UserViewModelFactory(context.applicationContext as Application)
+        factory = viewModelProviderFactoryOf { UserViewModel(context.applicationContext as Application) }
     )
 
     val users = userViewModel.readAllData.observeAsState(listOf()).value

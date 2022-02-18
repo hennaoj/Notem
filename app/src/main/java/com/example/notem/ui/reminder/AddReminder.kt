@@ -12,6 +12,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -19,13 +20,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.notem.data.reminder.Reminder
 import com.example.notem.data.reminder.ReminderViewModel
-import com.example.notem.data.reminder.ReminderViewModelFactory
 import com.example.notem.data.user.UserViewModel
-import com.example.notem.data.user.UserViewModelFactory
+import com.example.notem.data.viewModelProviderFactoryOf
 import com.google.accompanist.insets.systemBarsPadding
 import java.text.ParsePosition
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 @Composable
 fun AddReminder(
@@ -35,13 +36,13 @@ fun AddReminder(
     var userId: Long = 1
 
     val context = LocalContext.current
-
     val userViewModel: UserViewModel = viewModel(
-        factory = UserViewModelFactory(context.applicationContext as Application)
+        factory = viewModelProviderFactoryOf { UserViewModel(context.applicationContext as Application) }
     )
 
     val users = userViewModel.readAllData.observeAsState(listOf()).value
 
+    //checking the current user by fetching the user who is logged in
     for (i in users.indices) {
         if (users[i].loggedIn) {
             userId = users[i].userId
@@ -49,17 +50,23 @@ fun AddReminder(
     }
 
     val reminderViewModel: ReminderViewModel = viewModel(
-        factory = ReminderViewModelFactory(context.applicationContext as Application)
+        factory =viewModelProviderFactoryOf { ReminderViewModel(context.applicationContext as Application) }
     )
 
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.primaryVariant) {
+        val message = rememberSaveable { mutableStateOf("") }
+        val reminderTime = rememberSaveable { mutableStateOf("") }
+        val icon = rememberSaveable { mutableStateOf("Default")}
+        val checkedState = remember { mutableStateOf(true) }
+        val dailyRepeat = remember { mutableStateOf(false) }
+        val weeklyRepeat = remember { mutableStateOf(false) }
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .systemBarsPadding()
         ) { TopAppBar {
             IconButton(
-                onClick = { navController.navigate(route = "profile") },
+                onClick = { navController.navigate(route = "home") },
             ) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
@@ -67,9 +74,6 @@ fun AddReminder(
                 )
             }
         }}
-        val message = rememberSaveable { mutableStateOf("") }
-        val reminderTime = rememberSaveable { mutableStateOf("") }
-        val icon = rememberSaveable { mutableStateOf("Default")}
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -94,14 +98,72 @@ fun AddReminder(
             OutlinedTextField(
                 value = reminderTime.value,
                 onValueChange = { data -> reminderTime.value = data },
-                label = { Text("dd-mm-yyyy hh:mm")},
+                label = { Text("dd-mm-yyyy hh:mm")}, //guide for date format
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password
+                    keyboardType = KeyboardType.Text
                 ),
                 shape = MaterialTheme.shapes.small,
             )
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(20.dp))
+            Row {
+                Text(
+                    text = "send notification",
+                    modifier = Modifier.fillMaxWidth(fraction = 0.5f),
+                    color = Color(0xFF000000)
+                )
+                Spacer(modifier = Modifier.fillMaxWidth(fraction = 0.5f))
+                Switch(
+                    checked = checkedState.value,
+                    onCheckedChange = { checkedState.value = it },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colors.primary
+                    )
+                )
+            }
+            Spacer(modifier = Modifier.height(20.dp))
+            Row {
+                Text(
+                    text = "repeat daily",
+                    modifier = Modifier.fillMaxWidth(fraction = 0.5f),
+                    color = Color(0xFF000000)
+                )
+                Spacer(modifier = Modifier.fillMaxWidth(fraction = 0.5f))
+                Switch(
+                    checked = dailyRepeat.value,
+                    onCheckedChange = {
+                        dailyRepeat.value = it
+                        if (weeklyRepeat.value) {
+                            weeklyRepeat.value = !weeklyRepeat.value
+                        }
+                    },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colors.primary
+                    )
+                )
+            }
+            Spacer(modifier = Modifier.height(20.dp))
+            Row {
+                Text(
+                    text = "repeat weekly",
+                    modifier = Modifier.fillMaxWidth(fraction = 0.5f),
+                    color = Color(0xFF000000)
+                )
+                Spacer(modifier = Modifier.fillMaxWidth(fraction = 0.5f))
+                Switch(
+                    checked = weeklyRepeat.value,
+                    onCheckedChange = {
+                        weeklyRepeat.value = it
+                        if (dailyRepeat.value) {
+                            dailyRepeat.value = !dailyRepeat.value
+                        }
+                    },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colors.primary
+                    )
+                )
+            }
+            Spacer(modifier = Modifier.height(20.dp))
             Button(
                 onClick = { addReminder(
                     message = message.value,
@@ -109,7 +171,10 @@ fun AddReminder(
                     reminderViewModel = reminderViewModel,
                     navController = navController,
                     userId = userId,
-                    icon = icon.value
+                    icon = icon.value,
+                    notification = checkedState.value,
+                    repeatDaily = dailyRepeat.value,
+                    repeatWeekly = weeklyRepeat.value
                 ) },
                 enabled = true,
                 shape = MaterialTheme.shapes.medium,
@@ -127,22 +192,40 @@ fun addReminder(
     reminderViewModel: ReminderViewModel,
     navController: NavController,
     userId: Long,
-    icon: String
+    icon: String,
+    notification: Boolean,
+    repeatDaily: Boolean,
+    repeatWeekly: Boolean
 ) {
     val date = SimpleDateFormat("dd-MM-yyyy HH:mm").parse(reminderTime,  ParsePosition(0))
+
+    //making sure that the date input was in the correct format before
+    //creating a new reminder
     if (date != null) {
-        reminderViewModel.addReminder(
-            reminder = Reminder(
-                message = message,
-                locationX = 12,
-                locationY = 12,
-                reminderTime = date.time,
-                creationTime = Date().time,
-                creatorId = userId,
-                sendNotification = false,
-                icon = icon
-            )
+        val reminder = Reminder(
+            message = message,
+            locationX = 12,
+            locationY = 12,
+            reminderTime = date.time,
+            creationTime = Date().time,
+            creatorId = userId,
+            sendNotification = notification,
+            icon = icon
         )
+        val difference: Long = (date.time - Date().time) / 1000
+
+        reminderViewModel.addReminder(
+            reminder = reminder
+        )
+        //if send notification was chosen, creating a new notification
+        if (notification && (difference > 0)) {
+            reminderViewModel.setReminderNotification(
+                delay = difference,
+                reminder = reminder,
+                daily = repeatDaily,
+                weekly = repeatWeekly
+            )
+        }
     }
     navController.navigate(route = "home")
 }
@@ -158,6 +241,9 @@ private fun IconListDropdown(
         Icons.Filled.ArrowDropDown
     }
 
+
+    //a list of icons and a list of strings that relate to those icons
+    //the string is stored with the reminder to later fetch an icon in the home screen
     val icons = listOf(
         Icons.Filled.StickyNote2,
         Icons.Filled.Work,

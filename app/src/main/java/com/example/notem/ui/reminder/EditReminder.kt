@@ -19,7 +19,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.notem.data.reminder.Reminder
 import com.example.notem.data.reminder.ReminderViewModel
-import com.example.notem.data.reminder.ReminderViewModelFactory
+import com.example.notem.data.viewModelProviderFactoryOf
 import com.google.accompanist.insets.systemBarsPadding
 import java.text.ParsePosition
 import java.text.SimpleDateFormat
@@ -35,20 +35,23 @@ fun EditReminder(
     var reminderTime by remember { mutableStateOf("") }
     var creator: Long by remember { mutableStateOf(1) }
     val icon = rememberSaveable { mutableStateOf("Default")}
+    var checkedState by remember { mutableStateOf(true) }
 
     val context = LocalContext.current
     val reminderViewModel: ReminderViewModel = viewModel(
-        factory = ReminderViewModelFactory(context.applicationContext as Application)
+        factory = viewModelProviderFactoryOf { ReminderViewModel(context.applicationContext as Application) }
     )
 
     val reminders = reminderViewModel.readAllData.observeAsState(listOf()).value
 
+    //looking for the correct reminder given the reminderId parameter
     for (reminder in reminders) {
         if (reminder.reminderId == reminderId) {
             message = reminder.message
             reminderTime = reminder.reminderTime.formatToString()
             icon.value = reminder.icon
             creator = reminder.creatorId
+            checkedState = reminder.sendNotification
         }
     }
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.primaryVariant) {
@@ -139,7 +142,8 @@ fun EditReminder(
                             navController = navController,
                             reminderId = reminderId,
                             icon = icon.value,
-                            creatorId = creator
+                            creatorId = creator,
+                            notification = checkedState
                         )
                     },
                     modifier = Modifier.fillMaxWidth(fraction = 1f).padding(top = 10.dp),
@@ -161,22 +165,25 @@ fun editReminder(
     navController: NavController,
     reminderId: Long,
     icon: String,
-    creatorId: Long
+    creatorId: Long,
+    notification: Boolean
 ) {
     val date = SimpleDateFormat("dd-MM-yyyy HH:mm").parse(reminderTime,  ParsePosition(0))
     if (date != null) {
+        val reminder = Reminder(
+            reminderId = reminderId,
+            message = message,
+            locationX = 12,
+            locationY = 12,
+            reminderTime = date.time,
+            creationTime = Date().time,
+            creatorId = creatorId,
+            sendNotification = notification,
+            icon = icon
+        )
+        val difference: Long = ( date.time - Date().time ) / 1000
         reminderViewModel.updateReminder(
-            reminder = Reminder(
-                reminderId = reminderId,
-                message = message,
-                locationX = 12,
-                locationY = 12,
-                reminderTime = date.time,
-                creationTime = Date().time,
-                creatorId = creatorId,
-                sendNotification = false,
-                icon = icon
-            )
+            reminder = reminder
         )
     }
     navController.navigate(route = "home")

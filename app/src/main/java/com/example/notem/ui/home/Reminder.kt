@@ -10,6 +10,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -23,7 +25,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.notem.data.reminder.Reminder
 import com.example.notem.data.user.UserViewModel
-import com.example.notem.data.user.UserViewModelFactory
+import com.example.notem.data.viewModelProviderFactoryOf
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -36,7 +38,7 @@ fun ReminderListInit(
 
     val context = LocalContext.current
     val userViewModel: UserViewModel = viewModel(
-        factory = UserViewModelFactory(context.applicationContext as Application)
+        factory = viewModelProviderFactoryOf { UserViewModel(context.applicationContext as Application) }
     )
 
     val users = userViewModel.readAllData.observeAsState(listOf()).value
@@ -48,17 +50,41 @@ fun ReminderListInit(
         }
     }
 
+    val showAll = remember { mutableStateOf(false) }
     val list: MutableList<Reminder> = mutableListOf()
 
     for (item in reminders) {
+        // only showing reminders that the logged in user has made
         if (item.creatorId == userId) {
-            list.add(item)
+            if (showAll.value) {
+                list.add(item)
+            } else if (item.reminderTime  - Date().time < 0) {
+                list.add(item)
+            }
         }
     }
 
     Column(
         modifier = modifier
     ) {
+        Spacer(modifier = Modifier.height(10.dp))
+        Row {
+            Spacer(modifier = Modifier.width(20.dp))
+            Text(
+                text = "show all",
+                color = Color(0xFF000000)
+            )
+            Spacer(modifier = Modifier.width(20.dp))
+            Switch(
+                checked = showAll.value,
+                onCheckedChange = { showAll.value = it },
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = MaterialTheme.colors.primary
+                ),
+                modifier = Modifier.offset(y = 0.dp)
+            )
+        }
+        Spacer(modifier = Modifier.height(10.dp))
         ReminderList(
             list = list,
             navController = navController
@@ -96,7 +122,7 @@ fun ReminderListItem(
     modifier: Modifier = Modifier,
     navController: NavController
 ) {
-    val icon = convertToImageVector(icon = reminder.icon)
+    val icon = ConvertToImageVector(icon = reminder.icon)
     ConstraintLayout(modifier = modifier.fillMaxWidth()) {
         val (divider, reminderConstrain, box, date, edit, iconCons) = createRefs()
         Divider(
@@ -210,7 +236,7 @@ private fun Date.formatToString(): String {
     return SimpleDateFormat("EEE, d MMM yyyy, 'klo' HH:mm", Locale.getDefault()).format(this)
 }
 
-private fun convertToImageVector(icon: String): ImageVector {
+private fun ConvertToImageVector(icon: String): ImageVector {
     return when (icon) {
         "Default" -> {
             Icons.Filled.StickyNote2

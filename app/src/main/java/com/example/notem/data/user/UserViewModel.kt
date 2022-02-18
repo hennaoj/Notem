@@ -39,15 +39,3 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 }
-
-class UserViewModelFactory(
-    private val application: Application
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        @Suppress("UNCHECKED_CAST")
-        if (modelClass.isAssignableFrom(UserViewModel::class.java)) {
-            return UserViewModel(application) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}
