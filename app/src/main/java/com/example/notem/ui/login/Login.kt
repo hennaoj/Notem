@@ -39,6 +39,7 @@ fun Login(
 
     val users = userViewModel.readAllData.observeAsState(listOf()).value
 
+    //logging out all users when entering login screen
     for (i in users.indices) {
         if (users[i].loggedIn) {
             userViewModel.logUser(loggedIn = false, id = users[i].userId)
@@ -58,7 +59,7 @@ fun Login(
         ) {
             Image(
                 painterResource(R.drawable.notem),
-                "content description",
+                "application icon",
                 modifier = Modifier
                     .fillMaxWidth()
                     .size(50.dp)

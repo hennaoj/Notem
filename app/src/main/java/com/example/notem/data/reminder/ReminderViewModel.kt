@@ -3,21 +3,23 @@ package com.example.notem.data.reminder
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.TaskStackBuilder
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.*
-import com.example.notem.Graph
-import com.example.notem.NotificationWorker
+import com.example.notem.*
+import com.example.notem.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
-import com.example.notem.R
 
 class ReminderViewModel(application: Application) : ViewModel() {
 
@@ -71,6 +73,7 @@ class ReminderViewModel(application: Application) : ViewModel() {
                     if (sendNotification) {
                         createReminderNotification(reminder = reminder)
                     }
+
                     //setting another reminder if daily or weekly repeat is on
                     if (daily) {
                         setReminderNotification(delay = 86400, reminder = reminder, daily = daily, weekly = weekly)
@@ -105,16 +108,22 @@ private fun createNotificationChannel(context: Context) {
 private fun createReminderNotification(reminder: Reminder) {
     //using the reminder's creation time to get a unique id
     val id = reminder.creationTime.toInt()
+
+    val intent = Intent(Graph.appContext, MainActivity::class.java)
+    val pendingIntent = TaskStackBuilder.create(Graph.appContext).run {
+        addNextIntentWithParentStack(intent)
+        getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+    }
+
     val builder = NotificationCompat.Builder(Graph.appContext, "CHANNEL_ID")
         .setSmallIcon(R.drawable.notification)
         .setContentTitle("Notem Reminder")
         .setContentText(reminder.message)
         .setPriority(NotificationCompat.PRIORITY_HIGH)
-        .setLights(Color.BLUE, 5000, 5000)
+        .setContentIntent(pendingIntent)
 
 
     with(NotificationManagerCompat.from(Graph.appContext)) {
-        //notificationId is unique for each notification that you define
         notify(id, builder.build())
     }
 }

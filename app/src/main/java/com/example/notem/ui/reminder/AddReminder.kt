@@ -106,6 +106,8 @@ fun AddReminder(
                 shape = MaterialTheme.shapes.small,
             )
             Spacer(modifier = Modifier.height(20.dp))
+
+            //switch for setting a notification
             Row {
                 Text(
                     text = "send notification",
@@ -115,13 +117,23 @@ fun AddReminder(
                 Spacer(modifier = Modifier.fillMaxWidth(fraction = 0.5f))
                 Switch(
                     checked = checkedState.value,
-                    onCheckedChange = { checkedState.value = it },
+                    onCheckedChange = {
+                        checkedState.value = it
+                        if (weeklyRepeat.value) {
+                            weeklyRepeat.value = !weeklyRepeat.value
+                        }
+                        if (dailyRepeat.value) {
+                            dailyRepeat.value = !dailyRepeat.value
+                        }
+                    },
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = MaterialTheme.colors.primary
                     )
                 )
             }
             Spacer(modifier = Modifier.height(20.dp))
+
+            //switch for setting the notification to repeat daily
             Row {
                 Text(
                     text = "repeat daily",
@@ -136,6 +148,9 @@ fun AddReminder(
                         if (weeklyRepeat.value) {
                             weeklyRepeat.value = !weeklyRepeat.value
                         }
+                        if (!checkedState.value) {
+                            checkedState.value = !checkedState.value
+                        }
                     },
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = MaterialTheme.colors.primary
@@ -143,6 +158,8 @@ fun AddReminder(
                 )
             }
             Spacer(modifier = Modifier.height(20.dp))
+
+            //switch for setting the notification to repeat weekly
             Row {
                 Text(
                     text = "repeat weekly",
@@ -157,6 +174,9 @@ fun AddReminder(
                         if (dailyRepeat.value) {
                             dailyRepeat.value = !dailyRepeat.value
                         }
+                        if (!checkedState.value) {
+                            checkedState.value = !checkedState.value
+                        }
                     },
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = MaterialTheme.colors.primary
@@ -164,6 +184,7 @@ fun AddReminder(
                 )
             }
             Spacer(modifier = Modifier.height(20.dp))
+
             Button(
                 onClick = { addReminder(
                     message = message.value,

@@ -1,10 +1,16 @@
 package com.example.notem.ui
 
+import android.app.Application
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.notem.data.user.UserViewModel
+import com.example.notem.data.viewModelProviderFactoryOf
 import com.example.notem.ui.help.HelpScreen
 import com.example.notem.ui.help.SecondHelpScreen
 import com.example.notem.ui.help.ThirdHelpScreen
@@ -17,12 +23,30 @@ import com.example.notem.ui.reminder.AddReminder
 import com.example.notem.ui.reminder.EditReminder
 
 @Composable
-fun NotemApp(
-) {
+fun NotemApp() {
     val appState : NotemAppState = rememberNotemAppState()
+    val context = LocalContext.current
+    val userViewModel: UserViewModel = viewModel(
+        factory = viewModelProviderFactoryOf { UserViewModel(context.applicationContext as Application) }
+    )
+
+    val users = userViewModel.readAllData.observeAsState(listOf()).value
+    var destination = ""
+
+
+    for (i in users.indices) {
+        if (users[i].loggedIn) {
+            destination = "home"
+        }
+    }
+
+    if (destination != "home") {
+        destination = "login"
+    }
+
     NavHost(
         navController =  appState.navController,
-        startDestination = "login"
+        startDestination = destination
     ) {
         composable(route = "login") {
             Login(navController = appState.navController)

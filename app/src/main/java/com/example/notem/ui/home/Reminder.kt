@@ -50,19 +50,26 @@ fun ReminderListInit(
         }
     }
 
+    //boolean for choosing whether to show all reminders or the ones that have passed
     val showAll = remember { mutableStateOf(false) }
     val list: MutableList<Reminder> = mutableListOf()
 
     for (item in reminders) {
         // only showing reminders that the logged in user has made
         if (item.creatorId == userId) {
+            //adding all if showAll set to true
             if (showAll.value) {
                 list.add(item)
-            } else if (item.reminderTime  - Date().time < 0) {
+            }
+            //if time difference between this moment and the reminder time is negative
+            //the reminder has passed and is added to the list
+            else if (item.reminderTime  - Date().time < 0) {
                 list.add(item)
             }
         }
     }
+
+    list.sortByDescending { it.reminderTime }
 
     Column(
         modifier = modifier
@@ -122,7 +129,7 @@ fun ReminderListItem(
     modifier: Modifier = Modifier,
     navController: NavController
 ) {
-    val icon = ConvertToImageVector(icon = reminder.icon)
+    val icon = convertToImageVector(icon = reminder.icon)
     ConstraintLayout(modifier = modifier.fillMaxWidth()) {
         val (divider, reminderConstrain, box, date, edit, iconCons) = createRefs()
         Divider(
@@ -207,6 +214,7 @@ fun ReminderListItem(
             tint = Color.Black
         )
         ClickableText(
+            //adding the reminder id to the route to get access to it in the edit reminder screen
             onClick = { navController.navigate(route = "editReminder/".plus(reminder.reminderId)) },
             modifier = Modifier.constrainAs(edit) {
                 linkTo(
@@ -236,7 +244,7 @@ private fun Date.formatToString(): String {
     return SimpleDateFormat("EEE, d MMM yyyy, 'klo' HH:mm", Locale.getDefault()).format(this)
 }
 
-private fun ConvertToImageVector(icon: String): ImageVector {
+private fun convertToImageVector(icon: String): ImageVector {
     return when (icon) {
         "Default" -> {
             Icons.Filled.StickyNote2
