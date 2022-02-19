@@ -69,7 +69,9 @@ fun ReminderListInit(
         }
     }
 
-    list.sortByDescending { it.reminderTime }
+    //NOTE! when using sortByDescending and when showAll is on the reminder messages do not show normally
+    //and have weird alignment
+    list.sortBy { it.reminderTime }
 
     Column(
         modifier = modifier
@@ -101,7 +103,7 @@ fun ReminderListInit(
 
 @Composable
 private fun ReminderList(
-    list: List<Reminder>,
+    list: MutableList<Reminder>,
     navController: NavController
 ) {
     LazyColumn(
@@ -172,16 +174,16 @@ fun ReminderListItem(
             }
         )
         Text(
-            text = reminder.message,
+            text = reminder.message.replace("\n",""),
             style = MaterialTheme.typography.body1,
-            maxLines = 1,
+            maxLines = 10,
             color = Color.Black,
             modifier = Modifier.constrainAs(reminderConstrain) {
                 linkTo(
                     start = parent.start,
                     end = parent.end,
                     startMargin = 24.dp,
-                    endMargin = 24.dp,
+                    endMargin = 5.dp,
                     bias = 0f
                 )
                 top.linkTo(
