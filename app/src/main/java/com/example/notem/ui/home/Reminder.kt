@@ -44,6 +44,7 @@ fun ReminderListInit(
     val users = userViewModel.readAllData.observeAsState(listOf()).value
     var userId: Long = 1
 
+    //checking the user to show only their reminders
     for (i in users.indices) {
         if (users[i].loggedIn) {
             userId = users[i].userId
