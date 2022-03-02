@@ -18,6 +18,12 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
+
+
+        Properties properties = new Properties()
+
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        manifestPlaceholders = [MAPS_API_KEY: "${properties.getProperty('MAPS_API_KEY')}"]
     }
 
     buildTypes {
@@ -93,5 +99,12 @@ dependencies {
 
     //Work Manager
     implementation "androidx.work:work-runtime-ktx:2.7.1"
+
+
+    //Map dependencies
+    implementation "com.google.maps.android:maps-ktx:3.3.0"
+    implementation "com.google.maps.android:maps-utils-ktx:3.3.0"
+    implementation "com.google.android.gms:play-services-maps:18.0.2"
+    implementation "com.google.maps.android:android-maps-utils:2.2.3"
 
 }

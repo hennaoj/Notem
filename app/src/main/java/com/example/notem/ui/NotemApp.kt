@@ -19,6 +19,8 @@ import com.example.notem.ui.login.CreateAccount
 import com.example.notem.ui.profile.EditProfile
 import com.example.notem.ui.profile.Profile
 import com.example.notem.ui.login.Login
+import com.example.notem.ui.maps.AddLocation
+import com.example.notem.ui.maps.UserLocation
 import com.example.notem.ui.reminder.AddReminder
 import com.example.notem.ui.reminder.EditReminder
 
@@ -62,6 +64,12 @@ fun NotemApp() {
         }
         composable(route = "addReminder") {
             AddReminder(navController = appState.navController)
+        }
+        composable(route = "addLocation") {
+            AddLocation(navController = appState.navController)
+        }
+        composable(route = "userLocation") {
+            UserLocation(navController = appState.navController)
         }
         composable(route = "editProfile") {
             EditProfile(navController = appState.navController)

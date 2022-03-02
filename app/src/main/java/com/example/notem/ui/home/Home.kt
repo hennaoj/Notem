@@ -96,7 +96,7 @@ private fun HomeAppBar(
             )
         }
         IconButton(
-            onClick = { },
+            onClick = { navController.navigate(route = "userLocation") },
             modifier = Modifier.fillMaxWidth(fraction = 0.25f)
         ) {
             Icon(

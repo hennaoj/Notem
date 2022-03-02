@@ -23,6 +23,7 @@ import com.example.notem.data.reminder.ReminderViewModel
 import com.example.notem.data.user.UserViewModel
 import com.example.notem.data.viewModelProviderFactoryOf
 import com.google.accompanist.insets.systemBarsPadding
+import com.google.android.gms.maps.model.LatLng
 import java.text.ParsePosition
 import java.text.SimpleDateFormat
 import java.util.*
@@ -53,6 +54,15 @@ fun AddReminder(
         factory =viewModelProviderFactoryOf { ReminderViewModel(context.applicationContext as Application) }
     )
 
+    val latlng = navController
+        .currentBackStackEntry
+        ?.savedStateHandle
+        ?.getLiveData<LatLng>("location_data")
+        ?.value
+
+    val longitude = remember { mutableStateOf(latlng?.longitude ?: 0)}
+    val latitude = remember { mutableStateOf(latlng?.latitude ?: 0)}
+
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.primaryVariant) {
         val message = rememberSaveable { mutableStateOf("") }
         val reminderTime = rememberSaveable { mutableStateOf("") }
@@ -60,6 +70,7 @@ fun AddReminder(
         val checkedState = remember { mutableStateOf(true) }
         val dailyRepeat = remember { mutableStateOf(false) }
         val weeklyRepeat = remember { mutableStateOf(false) }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -105,6 +116,45 @@ fun AddReminder(
                 ),
                 shape = MaterialTheme.shapes.small,
             )
+            Spacer(modifier = Modifier.height(20.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Top
+            ) {
+                OutlinedTextField(
+                    value = latitude.value.toString(),
+                    onValueChange = {},
+                    label = { Text("latitude")},
+                    modifier = Modifier.fillMaxWidth(fraction = 0.33f),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text
+                    ),
+                    maxLines = 1,
+                    shape = MaterialTheme.shapes.small,
+                    enabled = false
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                OutlinedTextField(
+                    value = longitude.value.toString(),
+                    onValueChange = {},
+                    label = { Text("longitude")},
+                    modifier = Modifier.fillMaxWidth(fraction = 0.5f),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text
+                    ),
+                    maxLines = 1,
+                    shape = MaterialTheme.shapes.small,
+                    enabled = false
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Button(
+                    onClick = { navController.navigate("addLocation") },
+                    shape = MaterialTheme.shapes.small,
+                    modifier = Modifier.height(55.dp).padding(top = 15.dp)
+                ) {
+                    Text(text = "Open map")
+                }
+            }
             Spacer(modifier = Modifier.height(20.dp))
 
             //switch for setting a notification
@@ -195,7 +245,9 @@ fun AddReminder(
                     icon = icon.value,
                     notification = checkedState.value,
                     repeatDaily = dailyRepeat.value,
-                    repeatWeekly = weeklyRepeat.value
+                    repeatWeekly = weeklyRepeat.value,
+                    locationX = longitude.value.toDouble(),
+                    locationY = latitude.value.toDouble()
                 ) },
                 enabled = true,
                 shape = MaterialTheme.shapes.medium,
@@ -216,7 +268,9 @@ fun addReminder(
     icon: String,
     notification: Boolean,
     repeatDaily: Boolean,
-    repeatWeekly: Boolean
+    repeatWeekly: Boolean,
+    locationX: Double,
+    locationY: Double
 ) {
     val date = SimpleDateFormat("dd-MM-yyyy HH:mm").parse(reminderTime,  ParsePosition(0))
 
@@ -225,8 +279,8 @@ fun addReminder(
     if (date != null) {
         val reminder = Reminder(
             message = message,
-            locationX = 12,
-            locationY = 12,
+            locationX = locationX,
+            locationY = locationY,
             reminderTime = date.time,
             creationTime = Date().time,
             creatorId = userId,

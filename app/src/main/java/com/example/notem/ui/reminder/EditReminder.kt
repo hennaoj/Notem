@@ -173,8 +173,8 @@ fun editReminder(
         val reminder = Reminder(
             reminderId = reminderId,
             message = message,
-            locationX = 12,
-            locationY = 12,
+            locationX = 12.toDouble(),
+            locationY = 12.toDouble(),
             reminderTime = date.time,
             creationTime = Date().time,
             creatorId = creatorId,
@@ -198,8 +198,8 @@ fun deleteReminder(
         reminder = Reminder(
             reminderId = reminderId,
             message = "delete",
-            locationX = 12,
-            locationY = 12,
+            locationX = 12.toDouble(),
+            locationY = 12.toDouble(),
             reminderTime = Date().time,
             creationTime = Date().time,
             creatorId = 2,

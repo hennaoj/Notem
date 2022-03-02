@@ -15,10 +15,10 @@ data class Reminder(
     var message: String,
 
     @ColumnInfo(name = "location_x")
-    var locationX: Long,
+    var locationX: Double,
 
     @ColumnInfo(name = "location_y")
-    var locationY: Long,
+    var locationY: Double,
 
     @ColumnInfo(name = "reminder_time")
     var reminderTime: Long,
