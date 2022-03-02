@@ -67,9 +67,12 @@ fun AddReminder(
         val message = rememberSaveable { mutableStateOf("") }
         val reminderTime = rememberSaveable { mutableStateOf("") }
         val icon = rememberSaveable { mutableStateOf("Default")}
-        val checkedState = remember { mutableStateOf(true) }
-        val dailyRepeat = remember { mutableStateOf(false) }
-        val weeklyRepeat = remember { mutableStateOf(false) }
+        val sendNotification = rememberSaveable { mutableStateOf(false) }
+        val dailyRepeat = rememberSaveable { mutableStateOf(false) }
+        val weeklyRepeat = rememberSaveable { mutableStateOf(false) }
+        val setLocation = rememberSaveable { mutableStateOf(false) }
+        val setDate = rememberSaveable { mutableStateOf(false) }
+
 
         Column(
             modifier = Modifier
@@ -106,134 +109,184 @@ fun AddReminder(
                 shape = MaterialTheme.shapes.small,
             )
             Spacer(modifier = Modifier.height(10.dp))
-            OutlinedTextField(
-                value = reminderTime.value,
-                onValueChange = { data -> reminderTime.value = data },
-                label = { Text("dd-mm-yyyy hh:mm")}, //guide for date format
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text
-                ),
-                shape = MaterialTheme.shapes.small,
-            )
-            Spacer(modifier = Modifier.height(20.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Top
-            ) {
-                OutlinedTextField(
-                    value = latitude.value.toString(),
-                    onValueChange = {},
-                    label = { Text("latitude")},
-                    modifier = Modifier.fillMaxWidth(fraction = 0.33f),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text
-                    ),
-                    maxLines = 1,
-                    shape = MaterialTheme.shapes.small,
-                    enabled = false
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                OutlinedTextField(
-                    value = longitude.value.toString(),
-                    onValueChange = {},
-                    label = { Text("longitude")},
+
+            //switch for setting a reminder time
+            Row {
+                Text(
+                    text = "set reminder time",
                     modifier = Modifier.fillMaxWidth(fraction = 0.5f),
+                    color = Color(0xFF000000)
+                )
+                Spacer(modifier = Modifier.fillMaxWidth(fraction = 0.5f))
+                Switch(
+                    checked = setDate.value,
+                    onCheckedChange = {
+                        setDate.value = it
+                    },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colors.primary
+                    )
+                )
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+
+            if (setDate.value) {
+                OutlinedTextField(
+                    value = reminderTime.value,
+                    onValueChange = { data -> reminderTime.value = data },
+                    label = { Text("dd-mm-yyyy hh:mm") }, //guide for date format
+                    modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text
                     ),
-                    maxLines = 1,
                     shape = MaterialTheme.shapes.small,
-                    enabled = false
                 )
-                Spacer(modifier = Modifier.width(10.dp))
-                Button(
-                    onClick = { navController.navigate("addLocation") },
-                    shape = MaterialTheme.shapes.small,
-                    modifier = Modifier.height(55.dp).padding(top = 15.dp)
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+
+
+            //switch for setting a location
+            Row {
+                Text(
+                    text = "set location",
+                    modifier = Modifier.fillMaxWidth(fraction = 0.5f),
+                    color = Color(0xFF000000)
+                )
+                Spacer(modifier = Modifier.fillMaxWidth(fraction = 0.5f))
+                Switch(
+                    checked = setLocation.value,
+                    onCheckedChange = {
+                        setLocation.value = it
+                    },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colors.primary
+                    )
+                )
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+
+            //setting a location
+            if (setLocation.value) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.Top
                 ) {
-                    Text(text = "Open map")
+                    OutlinedTextField(
+                        value = latitude.value.toString(),
+                        onValueChange = {},
+                        label = { Text("latitude") },
+                        modifier = Modifier.fillMaxWidth(fraction = 0.33f),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text
+                        ),
+                        maxLines = 1,
+                        shape = MaterialTheme.shapes.small,
+                        enabled = false
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    OutlinedTextField(
+                        value = longitude.value.toString(),
+                        onValueChange = {},
+                        label = { Text("longitude") },
+                        modifier = Modifier.fillMaxWidth(fraction = 0.5f),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text
+                        ),
+                        maxLines = 1,
+                        shape = MaterialTheme.shapes.small,
+                        enabled = false
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Button(
+                        onClick = { navController.navigate("addLocation") },
+                        shape = MaterialTheme.shapes.small,
+                        modifier = Modifier.height(55.dp).padding(top = 15.dp)
+                    ) {
+                        Text(text = "open map")
+                    }
                 }
+                Spacer(modifier = Modifier.height(10.dp))
             }
-            Spacer(modifier = Modifier.height(20.dp))
 
-            //switch for setting a notification
-            Row {
-                Text(
-                    text = "send notification",
-                    modifier = Modifier.fillMaxWidth(fraction = 0.5f),
-                    color = Color(0xFF000000)
-                )
-                Spacer(modifier = Modifier.fillMaxWidth(fraction = 0.5f))
-                Switch(
-                    checked = checkedState.value,
-                    onCheckedChange = {
-                        checkedState.value = it
-                        if (weeklyRepeat.value) {
-                            weeklyRepeat.value = !weeklyRepeat.value
-                        }
-                        if (dailyRepeat.value) {
-                            dailyRepeat.value = !dailyRepeat.value
-                        }
-                    },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = MaterialTheme.colors.primary
+            if (setDate.value || setLocation.value) {
+                //switch for setting a notification
+                Row {
+                    Text(
+                        text = "send notification",
+                        modifier = Modifier.fillMaxWidth(fraction = 0.5f),
+                        color = Color(0xFF000000)
                     )
-                )
-            }
-            Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.fillMaxWidth(fraction = 0.5f))
+                    Switch(
+                        checked = sendNotification.value,
+                        onCheckedChange = {
+                            sendNotification.value = it
+                            if (weeklyRepeat.value) {
+                                weeklyRepeat.value = !weeklyRepeat.value
+                            }
+                            if (dailyRepeat.value) {
+                                dailyRepeat.value = !dailyRepeat.value
+                            }
+                        },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = MaterialTheme.colors.primary
+                        )
+                    )
+                }
+                Spacer(modifier = Modifier.height(10.dp))
 
-            //switch for setting the notification to repeat daily
-            Row {
-                Text(
-                    text = "repeat daily",
-                    modifier = Modifier.fillMaxWidth(fraction = 0.5f),
-                    color = Color(0xFF000000)
-                )
-                Spacer(modifier = Modifier.fillMaxWidth(fraction = 0.5f))
-                Switch(
-                    checked = dailyRepeat.value,
-                    onCheckedChange = {
-                        dailyRepeat.value = it
-                        if (weeklyRepeat.value) {
-                            weeklyRepeat.value = !weeklyRepeat.value
-                        }
-                        if (!checkedState.value) {
-                            checkedState.value = !checkedState.value
-                        }
-                    },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = MaterialTheme.colors.primary
+                //switch for setting the notification to repeat daily
+                Row {
+                    Text(
+                        text = "repeat daily",
+                        modifier = Modifier.fillMaxWidth(fraction = 0.5f),
+                        color = Color(0xFF000000)
                     )
-                )
-            }
-            Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.fillMaxWidth(fraction = 0.5f))
+                    Switch(
+                        checked = dailyRepeat.value,
+                        onCheckedChange = {
+                            dailyRepeat.value = it
+                            if (weeklyRepeat.value) {
+                                weeklyRepeat.value = !weeklyRepeat.value
+                            }
+                            if (!sendNotification.value) {
+                                sendNotification.value = !sendNotification.value
+                            }
+                        },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = MaterialTheme.colors.primary
+                        )
+                    )
+                }
+                Spacer(modifier = Modifier.height(10.dp))
 
-            //switch for setting the notification to repeat weekly
-            Row {
-                Text(
-                    text = "repeat weekly",
-                    modifier = Modifier.fillMaxWidth(fraction = 0.5f),
-                    color = Color(0xFF000000)
-                )
-                Spacer(modifier = Modifier.fillMaxWidth(fraction = 0.5f))
-                Switch(
-                    checked = weeklyRepeat.value,
-                    onCheckedChange = {
-                        weeklyRepeat.value = it
-                        if (dailyRepeat.value) {
-                            dailyRepeat.value = !dailyRepeat.value
-                        }
-                        if (!checkedState.value) {
-                            checkedState.value = !checkedState.value
-                        }
-                    },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = MaterialTheme.colors.primary
+                //switch for setting the notification to repeat weekly
+                Row {
+                    Text(
+                        text = "repeat weekly",
+                        modifier = Modifier.fillMaxWidth(fraction = 0.5f),
+                        color = Color(0xFF000000)
                     )
-                )
+                    Spacer(modifier = Modifier.fillMaxWidth(fraction = 0.5f))
+                    Switch(
+                        checked = weeklyRepeat.value,
+                        onCheckedChange = {
+                            weeklyRepeat.value = it
+                            if (dailyRepeat.value) {
+                                dailyRepeat.value = !dailyRepeat.value
+                            }
+                            if (!sendNotification.value) {
+                                sendNotification.value = !sendNotification.value
+                            }
+                        },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = MaterialTheme.colors.primary
+                        )
+                    )
+                }
+                Spacer(modifier = Modifier.height(20.dp))
             }
-            Spacer(modifier = Modifier.height(20.dp))
 
             Button(
                 onClick = { addReminder(
@@ -243,11 +296,13 @@ fun AddReminder(
                     navController = navController,
                     userId = userId,
                     icon = icon.value,
-                    notification = checkedState.value,
+                    notification = sendNotification.value,
                     repeatDaily = dailyRepeat.value,
                     repeatWeekly = weeklyRepeat.value,
                     locationX = longitude.value.toDouble(),
-                    locationY = latitude.value.toDouble()
+                    locationY = latitude.value.toDouble(),
+                    setDate = setDate.value,
+                    setLocation = setLocation.value
                 ) },
                 enabled = true,
                 shape = MaterialTheme.shapes.medium,
@@ -270,17 +325,36 @@ fun addReminder(
     repeatDaily: Boolean,
     repeatWeekly: Boolean,
     locationX: Double,
-    locationY: Double
+    locationY: Double,
+    setDate: Boolean,
+    setLocation: Boolean
 ) {
-    val date = SimpleDateFormat("dd-MM-yyyy HH:mm").parse(reminderTime,  ParsePosition(0))
+
+    val date = if (setDate) {
+        SimpleDateFormat("dd-MM-yyyy HH:mm").parse(reminderTime, ParsePosition(0))
+    } else {
+        SimpleDateFormat("dd-MM-yyyy HH:mm").parse("01-01-1970 00:00", ParsePosition(0))
+    }
+
+    val lat = if (setLocation) {
+        locationY
+    } else {
+        0.toDouble()
+    }
+
+    val lon = if (setLocation) {
+        locationX
+    } else {
+        0.toDouble()
+    }
 
     //making sure that the date input was in the correct format before
     //creating a new reminder
     if (date != null) {
         val reminder = Reminder(
             message = message,
-            locationX = locationX,
-            locationY = locationY,
+            locationX = lon,
+            locationY = lat,
             reminderTime = date.time,
             creationTime = Date().time,
             creatorId = userId,

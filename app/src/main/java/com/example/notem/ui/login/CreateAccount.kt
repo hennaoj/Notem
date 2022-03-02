@@ -146,6 +146,13 @@ fun addAccount(
     userViewModel: UserViewModel,
     navController: NavController
 ) {
-    userViewModel.addUser(user = User(userName = username, passWord = password, first = firstName, last = lastName))
+    userViewModel.addUser(user = User(
+        userName = username,
+        passWord = password,
+        first = firstName,
+        last = lastName,
+        userX = 0.toDouble(),
+        userY = 0.toDouble()
+    ))
     navController.navigate(route = "login")
 }

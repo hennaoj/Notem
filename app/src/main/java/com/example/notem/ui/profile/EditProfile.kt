@@ -141,8 +141,15 @@ fun saveProfile(
     id: Long,
     navController: NavController
 ) {
-    viewModel.updateUser(user = User(userId = id, userName = username, first = first, last = last,
-        passWord = password, loggedIn = true)
-    )
+    viewModel.updateUser(user = User(
+        userId = id,
+        userName = username,
+        first = first,
+        last = last,
+        passWord = password,
+        loggedIn = true,
+        userX = 0.toDouble(),
+        userY = 0.toDouble()
+    ))
     navController.navigate(route = "profile")
 }

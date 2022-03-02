@@ -23,6 +23,12 @@ data class User(
     var last: String,
 
     @ColumnInfo(name = "loggedin")
-    var loggedIn: Boolean = false
+    var loggedIn: Boolean = false,
+
+    @ColumnInfo(name = "location_x")
+var userX: Double,
+
+@ColumnInfo(name = "location_y")
+var userY: Double,
 
 )
