@@ -84,6 +84,35 @@ class ReminderViewModel(application: Application) : ViewModel() {
                 }
             }
     }
+
+    fun cancelReminderNotification(creationTime: Long, delay: Long) {
+
+        val workManager = WorkManager.getInstance(Graph.appContext)
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+
+        //the canceling should happen after the notification has been send
+        //which is taken care of by the +0.03 in delay
+        val notificationWorker = OneTimeWorkRequestBuilder<NotificationWorker>()
+            .setInitialDelay(delay + 0.03.toLong(), TimeUnit.SECONDS)
+            .setConstraints(constraints)
+            .build()
+
+        workManager.enqueue(notificationWorker)
+
+        //Monitoring for state of work
+        workManager.getWorkInfoByIdLiveData(notificationWorker.id)
+            .observeForever { workInfo ->
+                if (workInfo.state == WorkInfo.State.SUCCEEDED) {
+                    val id = creationTime.toInt()
+                    val context = Graph.appContext
+                    val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                    manager.cancel(id)
+                }
+            }
+    }
 }
 
 private fun createNotificationChannel(context: Context) {

@@ -1,5 +1,6 @@
 package com.example.notem.ui.reminder
 
+import android.annotation.SuppressLint
 import android.app.Application
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -36,6 +37,8 @@ fun EditReminder(
     var creator: Long by remember { mutableStateOf(1) }
     val icon = rememberSaveable { mutableStateOf("Default")}
     var checkedState by remember { mutableStateOf(true) }
+    var creationTime by remember { mutableStateOf(0.toLong())}
+    val notificationTime = rememberSaveable { mutableStateOf(0.toLong())}
 
     val context = LocalContext.current
     val reminderViewModel: ReminderViewModel = viewModel(
@@ -52,6 +55,8 @@ fun EditReminder(
             icon.value = reminder.icon
             creator = reminder.creatorId
             checkedState = reminder.sendNotification
+            creationTime = reminder.creationTime
+            notificationTime.value = reminder.reminderTime
         }
     }
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.primaryVariant) {
@@ -123,7 +128,9 @@ fun EditReminder(
                         deleteReminder(
                             navController = navController,
                             reminderViewModel = reminderViewModel,
-                            reminderId = reminderId
+                            reminderId = reminderId,
+                            creationTime = creationTime,
+                            notificationTime = notificationTime.value
                         )
                     }
                 ) {
@@ -143,7 +150,9 @@ fun EditReminder(
                             reminderId = reminderId,
                             icon = icon.value,
                             creatorId = creator,
-                            notification = checkedState
+                            notification = checkedState,
+                            creationTime = creationTime,
+                            notificationTime = notificationTime.value
                         )
                     },
                     modifier = Modifier.fillMaxWidth(fraction = 1f).padding(top = 10.dp),
@@ -158,6 +167,7 @@ fun EditReminder(
 
 }
 
+@SuppressLint("SimpleDateFormat")
 fun editReminder(
     message: String,
     reminderTime: String,
@@ -166,22 +176,24 @@ fun editReminder(
     reminderId: Long,
     icon: String,
     creatorId: Long,
-    notification: Boolean
+    notification: Boolean,
+    creationTime: Long,
+    notificationTime: Long
 ) {
     val date = SimpleDateFormat("dd-MM-yyyy HH:mm").parse(reminderTime,  ParsePosition(0))
     if (date != null) {
         val reminder = Reminder(
             reminderId = reminderId,
             message = message,
-            locationX = 12.toDouble(),
-            locationY = 12.toDouble(),
-            reminderTime = date.time,
-            creationTime = Date().time,
+            locationX = 0.toDouble(),
+            locationY = 0.toDouble(),
+            reminderTime = notificationTime,
+            creationTime = creationTime,
             creatorId = creatorId,
             sendNotification = notification,
             icon = icon
         )
-        val difference: Long = ( date.time - Date().time ) / 1000
+
         reminderViewModel.updateReminder(
             reminder = reminder
         )
@@ -192,17 +204,29 @@ fun editReminder(
 fun deleteReminder(
     reminderViewModel: ReminderViewModel,
     navController: NavController,
-    reminderId: Long
+    reminderId: Long,
+    creationTime: Long,
+    notificationTime: Long
 ) {
+
+    val difference: Long = (notificationTime - Date().time) / 1000
+
+
+    //canceling a notification
+    reminderViewModel.cancelReminderNotification(
+        creationTime = creationTime,
+        delay = difference
+    )
+
     reminderViewModel.deleteReminder(
         reminder = Reminder(
             reminderId = reminderId,
             message = "delete",
-            locationX = 12.toDouble(),
-            locationY = 12.toDouble(),
-            reminderTime = Date().time,
-            creationTime = Date().time,
-            creatorId = 2,
+            locationX = 0.toDouble(),
+            locationY = 0.toDouble(),
+            reminderTime = notificationTime,
+            creationTime = creationTime,
+            creatorId = 1,
             sendNotification = false,
             icon = "Default"
         )

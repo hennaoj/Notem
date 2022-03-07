@@ -330,21 +330,28 @@ fun addReminder(
     setLocation: Boolean
 ) {
 
+    //if date is not set it will be set to unix epoch for simplicity
     val date = if (setDate) {
         SimpleDateFormat("dd-MM-yyyy HH:mm").parse(reminderTime, ParsePosition(0))
-    } else {
+    }
+    else {
         SimpleDateFormat("dd-MM-yyyy HH:mm").parse("01-01-1970 00:00", ParsePosition(0))
     }
 
+    //if location is not set the latitude and longitude will be set to 0 for simplicity
+    //since location is chosen from the map the likelihood a user selects exactly the (0,0)
+    //point for a reminder with a location is extremely small so it can be ignored here
     val lat = if (setLocation) {
         locationY
-    } else {
+    }
+    else {
         0.toDouble()
     }
 
     val lon = if (setLocation) {
         locationX
-    } else {
+    }
+    else {
         0.toDouble()
     }
 
@@ -367,7 +374,8 @@ fun addReminder(
             reminder = reminder
         )
         //if send notification was chosen, creating a new notification
-        if (notification && (difference > 0)) {
+        //if location was set, notification is not created yet
+        if (notification && (difference > 0) && !setLocation) {
             reminderViewModel.setReminderNotification(
                 delay = difference,
                 reminder = reminder,
