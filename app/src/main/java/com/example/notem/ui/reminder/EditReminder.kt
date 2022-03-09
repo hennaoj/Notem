@@ -26,6 +26,7 @@ import java.text.ParsePosition
 import java.text.SimpleDateFormat
 import java.util.*
 
+@SuppressLint("SimpleDateFormat")
 @Composable
 fun EditReminder(
     navController: NavController,
@@ -39,10 +40,13 @@ fun EditReminder(
     var checkedState by remember { mutableStateOf(true) }
     var creationTime by remember { mutableStateOf(0.toLong())}
     val notificationTime = rememberSaveable { mutableStateOf(0.toLong())}
+    var reminderLat by remember { mutableStateOf(0.toDouble()) }
+    var reminderLon by remember { mutableStateOf(0.toDouble()) }
+
 
     val context = LocalContext.current
     val reminderViewModel: ReminderViewModel = viewModel(
-        factory = viewModelProviderFactoryOf { ReminderViewModel(context.applicationContext as Application) }
+        factory =viewModelProviderFactoryOf { ReminderViewModel(context.applicationContext as Application) }
     )
 
     val reminders = reminderViewModel.readAllData.observeAsState(listOf()).value
@@ -57,23 +61,11 @@ fun EditReminder(
             checkedState = reminder.sendNotification
             creationTime = reminder.creationTime
             notificationTime.value = reminder.reminderTime
+            reminderLat = reminder.locationY
+            reminderLon = reminder.locationX
         }
     }
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.primaryVariant) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .systemBarsPadding()
-        ) { TopAppBar {
-            IconButton(
-                onClick = { navController.navigate(route = "profile") },
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = null,
-                )
-            }
-        }}
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -111,17 +103,20 @@ fun EditReminder(
                 shape = MaterialTheme.shapes.small,
             )
             Spacer(modifier = Modifier.height(10.dp))
-            OutlinedTextField(
-                value = reminderTime,
-                onValueChange = { data -> reminderTime = data },
-                label = { Text("dd-mm-yyyy hh:mm") },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text
-                ),
-                shape = MaterialTheme.shapes.small,
-            )
-            Spacer(modifier = Modifier.height(10.dp))
+            if (reminderTime != SimpleDateFormat("dd-MM-yyyy HH:mm").parse(
+                    "01-01-1970 00:00", ParsePosition(0)).time.formatToString()) {
+                OutlinedTextField(
+                    value = reminderTime,
+                    onValueChange = { data -> reminderTime = data },
+                    label = { Text("dd-mm-yyyy hh:mm") },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text
+                    ),
+                    shape = MaterialTheme.shapes.small,
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+            }
             Row {
                 FloatingActionButton(
                     onClick = {
@@ -152,7 +147,9 @@ fun EditReminder(
                             creatorId = creator,
                             notification = checkedState,
                             creationTime = creationTime,
-                            notificationTime = notificationTime.value
+                            notificationTime = notificationTime.value,
+                            reminderLat = reminderLat,
+                            reminderLon = reminderLon
                         )
                     },
                     modifier = Modifier.fillMaxWidth(fraction = 1f).padding(top = 10.dp),
@@ -167,7 +164,6 @@ fun EditReminder(
 
 }
 
-@SuppressLint("SimpleDateFormat")
 fun editReminder(
     message: String,
     reminderTime: String,
@@ -178,21 +174,54 @@ fun editReminder(
     creatorId: Long,
     notification: Boolean,
     creationTime: Long,
-    notificationTime: Long
+    notificationTime: Long,
+    reminderLon: Double,
+    reminderLat: Double
 ) {
     val date = SimpleDateFormat("dd-MM-yyyy HH:mm").parse(reminderTime,  ParsePosition(0))
     if (date != null) {
         val reminder = Reminder(
             reminderId = reminderId,
             message = message,
-            locationX = 0.toDouble(),
-            locationY = 0.toDouble(),
-            reminderTime = notificationTime,
+            locationX = reminderLon,
+            locationY = reminderLat,
+            reminderTime = date.time,
             creationTime = creationTime,
             creatorId = creatorId,
             sendNotification = notification,
             icon = icon
         )
+
+
+        if (notification) {
+            val difference: Long = (notificationTime - Date().time) / 1000
+
+            reminderViewModel.cancelReminderNotification(
+                creationTime = creationTime,
+                delay = difference
+            )
+            val updateReminder = Reminder(
+                reminderId = reminder.reminderId,
+                message = reminder.message,
+                locationX = reminder.locationX,
+                locationY = reminder.locationY,
+                reminderTime = reminder.reminderTime,
+                creationTime = Date().time,
+                creatorId = reminder.creatorId,
+                sendNotification = reminder.sendNotification,
+                icon = reminder.icon
+            )
+
+            val differenceToNew: Long = (reminder.reminderTime - Date().time) / 1000
+            if (reminder.sendNotification && (difference > 0)) {
+                reminderViewModel.setReminderNotification(
+                    delay = differenceToNew,
+                    reminder = updateReminder,
+                    daily = false,
+                    weekly = false
+                )
+            }
+        }
 
         reminderViewModel.updateReminder(
             reminder = reminder

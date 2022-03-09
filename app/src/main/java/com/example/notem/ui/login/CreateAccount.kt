@@ -152,7 +152,8 @@ fun addAccount(
         first = firstName,
         last = lastName,
         userX = 0.toDouble(),
-        userY = 0.toDouble()
+        userY = 0.toDouble(),
+        profilePic = ""
     ))
     navController.navigate(route = "login")
 }

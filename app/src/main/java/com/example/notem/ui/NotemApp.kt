@@ -1,6 +1,9 @@
 package com.example.notem.ui
 
 import android.app.Application
+import android.net.Uri
+import android.util.Log
+import androidx.camera.core.ImageCaptureException
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.platform.LocalContext
@@ -11,6 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.notem.data.user.UserViewModel
 import com.example.notem.data.viewModelProviderFactoryOf
+import com.example.notem.ui.camera.CameraView
 import com.example.notem.ui.help.HelpScreen
 import com.example.notem.ui.help.SecondHelpScreen
 import com.example.notem.ui.help.ThirdHelpScreen
@@ -23,9 +27,15 @@ import com.example.notem.ui.maps.AddLocation
 import com.example.notem.ui.maps.UserLocation
 import com.example.notem.ui.reminder.AddReminder
 import com.example.notem.ui.reminder.EditReminder
+import java.io.File
+import java.util.concurrent.Executor
 
 @Composable
-fun NotemApp() {
+fun NotemApp(
+    outputDirectory: File,
+    executor: Executor,
+    onImageCaptured: (Uri) -> Unit
+) {
     val appState : NotemAppState = rememberNotemAppState()
     val context = LocalContext.current
     val userViewModel: UserViewModel = viewModel(
@@ -70,6 +80,15 @@ fun NotemApp() {
         }
         composable(route = "userLocation") {
             UserLocation(navController = appState.navController)
+        }
+        composable(route = "camera") {
+            CameraView(
+                outputDirectory = outputDirectory,
+                executor = executor,
+                onImageCaptured = onImageCaptured,
+                onError = { Log.e("kilo", "View error:", it) },
+                navController = appState.navController
+            )
         }
         composable(route = "editProfile") {
             EditProfile(navController = appState.navController)

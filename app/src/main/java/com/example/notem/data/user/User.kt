@@ -26,9 +26,12 @@ data class User(
     var loggedIn: Boolean = false,
 
     @ColumnInfo(name = "location_x")
-var userX: Double,
+    var userX: Double,
 
-@ColumnInfo(name = "location_y")
-var userY: Double,
+    @ColumnInfo(name = "location_y")
+    var userY: Double,
+
+    @ColumnInfo(name = "profilePic")
+    var profilePic: String
 
 )

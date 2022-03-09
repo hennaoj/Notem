@@ -26,6 +26,7 @@ import androidx.navigation.NavController
 import com.example.notem.data.reminder.Reminder
 import com.example.notem.data.user.UserViewModel
 import com.example.notem.data.viewModelProviderFactoryOf
+import java.text.ParsePosition
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -154,8 +155,8 @@ fun ReminderListItem(
         )
         Text(
             text = when {
-                reminder.reminderTime != null -> { reminder.reminderTime.formatToString() }
-                else -> Date().formatToString()
+                reminder.reminderTime != SimpleDateFormat("dd-MM-yyyy HH:mm").parse("01-01-1970 00:00", ParsePosition(0)).time -> { reminder.reminderTime.formatToString() }
+                else -> "Dateless reminder"
             },
             color = Color.Black,
             maxLines = 1,

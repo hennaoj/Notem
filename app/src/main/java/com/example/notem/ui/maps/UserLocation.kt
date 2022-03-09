@@ -66,6 +66,7 @@ fun UserLocation(
     var lastName by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
     var passWord by remember { mutableStateOf("") }
+    var profilePic by remember { mutableStateOf("") }
     var id: Long = 0
 
     for (i in users.indices) {
@@ -77,6 +78,7 @@ fun UserLocation(
             username = users[i].userName
             id = users[i].userId
             passWord = users[i].passWord
+            profilePic = users[i].profilePic
         }
     }
 
@@ -99,8 +101,7 @@ fun UserLocation(
 
                 for (reminder in reminders) {
                     val title = if (reminder.reminderTime != SimpleDateFormat("dd-MM-yyyy HH:mm").parse(
-                            "01-01-1970 00:00", ParsePosition(0)
-                        ).time) {
+                            "01-01-1970 00:00", ParsePosition(0)).time) {
                         "${reminder.message} (${reminder.reminderTime.formatToString()})"
                     } else {
                         reminder.message
@@ -135,7 +136,8 @@ fun UserLocation(
                     id = id,
                     password = passWord,
                     reminders = reminders,
-                    reminderViewModel = reminderViewModel
+                    reminderViewModel = reminderViewModel,
+                    profilePic = profilePic
                 )
             }
         }
@@ -155,7 +157,8 @@ private fun setMapLongClick(
     viewModel: UserViewModel,
     id: Long,
     reminders: List<Reminder>,
-    reminderViewModel: ReminderViewModel
+    reminderViewModel: ReminderViewModel,
+    profilePic: String
 ) {
     map.setOnMapLongClickListener { latlng ->
 
@@ -172,13 +175,14 @@ private fun setMapLongClick(
             passWord = password,
             loggedIn = true,
             userX = userLon.value,
-            userY = userLat.value
+            userY = userLat.value,
+            profilePic = profilePic
         ))
 
 
         for (reminder in reminders) {
             if (reminder.locationX != 0.toDouble()) {
-                if (distance(
+                if (Distance(
                         userLat = userLat.value,
                         userLon = userLon.value,
                         reminderLat = reminder.locationY,
@@ -253,7 +257,7 @@ private fun setMapLongClick(
     }
 }
 
-private fun distance(
+private fun Distance(
     userLat: Double,
     userLon: Double,
     reminderLat: Double,
